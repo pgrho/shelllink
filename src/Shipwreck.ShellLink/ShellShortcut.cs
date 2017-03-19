@@ -10,6 +10,8 @@ namespace Shipwreck.ShellLink
 {
     public sealed class ShellShortcut
     {
+        private Collection<DataBlock> _ExtraData;
+
         public FileAttributesFlags FileAttributes { get; set; }
 
         public DateTime? CreationTime { get; set; }
@@ -22,12 +24,34 @@ namespace Shipwreck.ShellLink
         public Modifiers HotKeyModifiers { get; set; }
         public LinkInfo LinkInfo { get; set; }
         public IList<byte[]> LinkTargetIDList { get; set; }
-        public string Name { get; private set; }
-        public string RelativePath { get; private set; }
-        public string WorkingDir { get; private set; }
-        public string Arguments { get; private set; }
-        public string IconLocation { get; private set; }
+        public string Name { get; set; }
+        public string RelativePath { get; set; }
+        public string WorkingDir { get; set; }
+        public string Arguments { get; set; }
+        public string IconLocation { get; set; }
 
+        public Collection<DataBlock> ExtraData
+        {
+            get
+            {
+                return _ExtraData ?? (_ExtraData = new Collection<DataBlock>());
+            }
+            set
+            {
+                if (value == _ExtraData)
+                {
+                    return;
+                }
+                _ExtraData?.Clear();
+                if (value?.Count > 0)
+                {
+                    foreach (var item in value)
+                    {
+                        ExtraData.Add(item);
+                    }
+                }
+            }
+        }
         public static ShellShortcut Load(string fileName)
         {
             using (var fs = new FileStream(fileName, FileMode.Open))
@@ -120,95 +144,13 @@ namespace Shipwreck.ShellLink
                 r.IconLocation = reader.ReadStringData(isUnicode, ref sb, ref bytes);
             }
 
-            for (var bs = reader.ReadInt32(); bs > 4; bs = reader.ReadInt32())
+            foreach (var db in DataBlock.Parse(reader, ref bytes, ref sb))
             {
-                var sig = reader.ReadUInt32();
-
-                DataBlock db;
-                switch (sig)
-                {
-                    case EnvironmentVariableDataBlock.SIGNATURE:
-                        db = EnvironmentVariableDataBlock.Parse(reader, ref bytes, ref sb);
-                        break;
-
-                    case ConsoleDataBlock.SIGNATURE:
-                        db = ConsoleDataBlock.Parse(reader, ref sb);
-                        break;
-
-                    case ConsoleFEDataBlock.SIGNATURE:
-                        db = ConsoleFEDataBlock.Parse(reader);
-                        break;
-
-                    case DarwinDataBlock.SIGNATURE:
-                        db = DarwinDataBlock.Parse(reader, ref bytes, ref sb);
-                        break;
-
-                    case IconEnvironmentDataBlock.SIGNATURE:
-                        db = IconEnvironmentDataBlock.Parse(reader, ref bytes, ref sb);
-                        break;
-
-                    case KnownFolderDataBlock.SIGNATURE:
-                        db = KnownFolderDataBlock.Parse(reader);
-                        break;
-
-                    case PropertyStoreDataBlock.SIGNATURE:
-                        db = PropertyStoreDataBlock.Parse(reader, ref bytes, ref sb);
-                        break;
-
-                    case ShimDataBlock.SIGNATURE:
-                        db = ShimDataBlock.Parse(reader, bs, ref sb);
-                        break;
-
-                    case SpecialFolderDataBlock.SIGNATURE:
-                        db = SpecialFolderDataBlock.Parse(reader);
-                        break;
-
-                    case TrackerDataBlock.SIGNATURE:
-                        db = TrackerDataBlock.Parse(reader, bs, ref bytes);
-                        break;
-
-                    case VistaAndAboveIDListDataBlock.SIGNATURE:
-                        db = VistaAndAboveIDListDataBlock.Parse(reader);
-                        break;
-
-                    default:
-                        db = new UnknownDataBlock()
-                        {
-                            Signature = sig,
-                            Data = reader.ReadBytes(bs - 8)
-                        };
-                        break;
-                }
-
                 r.ExtraData.Add(db);
             }
 
             return r;
         }
 
-        private Collection<DataBlock> _ExtraData;
-
-        public Collection<DataBlock> ExtraData
-        {
-            get
-            {
-                return _ExtraData ?? (_ExtraData = new Collection<DataBlock>());
-            }
-            set
-            {
-                if (value == _ExtraData)
-                {
-                    return;
-                }
-                _ExtraData?.Clear();
-                if (value?.Count > 0)
-                {
-                    foreach (var item in value)
-                    {
-                        ExtraData.Add(item);
-                    }
-                }
-            }
-        }
     }
 }

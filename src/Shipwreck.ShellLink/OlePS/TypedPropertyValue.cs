@@ -12,7 +12,7 @@ namespace Shipwreck.ShellLink.OlePS
         public ValueType Type { get; set; }
         public object Value { get; set; }
 
-        public static TypedPropertyValue Parse(BinaryReader reader, ref byte[] bytes, ref StringBuilder sb)
+        public static TypedPropertyValue Parse(BinaryReader reader, int length, ref byte[] bytes, ref StringBuilder sb)
         {
             var r = new TypedPropertyValue();
             r.Type = (ValueType)reader.ReadInt16();
@@ -151,7 +151,6 @@ namespace Shipwreck.ShellLink.OlePS
                     writer.Write((float)Value);
                     break;
 
-
                 case ValueType.Double:
                     writer.Write((double)Value);
                     break;
@@ -204,7 +203,6 @@ namespace Shipwreck.ShellLink.OlePS
                     writer.Write((short)0);
                     break;
 
-
                 case ValueType.UInt16:
                     writer.Write((ushort)Value);
                     writer.Write((short)0);
@@ -219,8 +217,6 @@ namespace Shipwreck.ShellLink.OlePS
                 case ValueType.UInt64:
                     writer.Write((ulong)Value);
                     break;
-
-
 
                 case ValueType.Int64:
                     writer.Write((long)Value);
@@ -243,7 +239,6 @@ namespace Shipwreck.ShellLink.OlePS
                     writer.Write(((DateTime)Value).ToFileTimeUtc());
                     break;
 
-
                 case ValueType.Blob:
                 case ValueType.BlobObject:
                     if (Value != null)
@@ -260,9 +255,7 @@ namespace Shipwreck.ShellLink.OlePS
 
                 default:
                     throw new NotImplementedException("[MS-OLEPS] 2.15");
-
             }
         }
     }
-
 }

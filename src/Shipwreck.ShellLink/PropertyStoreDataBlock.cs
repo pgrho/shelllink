@@ -25,6 +25,8 @@ namespace Shipwreck.ShellLink
 
         internal static PropertyStoreDataBlock Parse(BinaryReader reader, ref byte[] bytes, ref StringBuilder sb)
         {
+            // [MS-PROPSTORE] 2.2
+
             var r = new PropertyStoreDataBlock();
             var size = reader.ReadUInt32();
 
@@ -37,27 +39,31 @@ namespace Shipwreck.ShellLink
 
             if (r.FormatID == StringName)
             {
+                // [MS-PROPSTORE] 2.3.1
+
                 var d = new Dictionary<string, TypedPropertyValue>();
-                for (var vs = reader.ReadUInt32(); vs != 0; vs = reader.ReadUInt32())
+                for (var vs = reader.ReadInt32(); vs != 0; vs = reader.ReadInt32())
                 {
                     var ns = reader.ReadUInt32();
                     reader.ReadByte(); // 0
-                    var n = reader.ReadUnicodeString(ref sb);
+                    int cc;
+                    var n = reader.ReadUnicodeString(ref sb, out cc);
 
-                    d[n] = TypedPropertyValue.Parse(reader, ref bytes, ref sb);
+                    d[n] = TypedPropertyValue.Parse(reader, vs - 9 - 2 * cc, ref bytes, ref sb);
                 }
                 r.StringNamedValues = d;
             }
             else
             {
-                var d = new Dictionary<int, TypedPropertyValue>();
-                for (var vs = reader.ReadUInt32(); vs != 0; vs = reader.ReadUInt32())
-                {
-                    var ns = reader.ReadUInt32();
-                    reader.ReadByte(); // 0
-                    var n = reader.ReadInt32();
+                // [MS-PROPSTORE] 2.3.2
 
-                    d[n] = TypedPropertyValue.Parse(reader, ref bytes, ref sb);
+                var d = new Dictionary<int, TypedPropertyValue>();
+                for (var vs = reader.ReadInt32(); vs != 0; vs = reader.ReadInt32())
+                {
+                    var n = reader.ReadInt32();
+                    reader.ReadByte(); // 0
+
+                    d[n] = TypedPropertyValue.Parse(reader, vs - 13, ref bytes, ref sb);
                 }
                 r.IntegerNamedValues = d;
             }
@@ -72,6 +78,7 @@ namespace Shipwreck.ShellLink
 
             writer.Write(0);
             writer.Write(VERSION);
+            writer.Write(FormatID);
 
             if (StringNamedValues?.Count > 0)
             {

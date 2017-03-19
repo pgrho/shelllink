@@ -56,6 +56,11 @@ namespace Shipwreck.ShellLink
 
         public static string ReadUnicodeString(this BinaryReader reader, ref StringBuilder sb, int length = -1)
         {
+            int cc;
+            return reader.ReadUnicodeString(ref sb, out cc, length: length);
+        }
+        public static string ReadUnicodeString(this BinaryReader reader, ref StringBuilder sb, out int count, int length = -1)
+        {
             if (sb == null)
             {
                 sb = new StringBuilder();
@@ -64,9 +69,11 @@ namespace Shipwreck.ShellLink
             {
                 sb.Clear();
             }
+            count = 0;
             var l = 0;
             for (var by = reader.ReadUInt16(); length >= 0 || by != 0; by = reader.ReadUInt16())
             {
+                count++;
                 sb.Append((char)by);
 
                 l = by != 0 ? sb.Length : l;

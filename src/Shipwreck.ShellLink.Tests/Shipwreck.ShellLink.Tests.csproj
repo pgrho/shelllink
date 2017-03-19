@@ -59,6 +59,14 @@
       <Name>Shipwreck.ShellLink</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="unicode_file.lnk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ansi_file.lnk">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
