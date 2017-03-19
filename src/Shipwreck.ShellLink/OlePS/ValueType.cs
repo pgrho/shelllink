@@ -38,7 +38,7 @@ namespace Shipwreck.ShellLink.OlePS
         StoredObject = 0x0045,
         BlobObject = 0x0046,
         CF = 0x0047,
-        CLSID = 0x0048,
+        ClsID = 0x0048,
         VERSIONED_STREAM = 0x0049
     }
 }

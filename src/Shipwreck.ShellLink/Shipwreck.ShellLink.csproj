@@ -53,6 +53,9 @@
       <DependentUpon>BinaryWriterExtensions.tt</DependentUpon>
     </Compile>
     <Compile Include="Key.cs" />
+    <Compile Include="PropStore\IntegerPropertyStore.cs" />
+    <Compile Include="PropStore\PropertyStore.cs" />
+    <Compile Include="PropStore\StringPropertyStore.cs" />
     <Compile Include="SpecialFolderDataBlock.cs" />
     <Compile Include="KnownFolderDataBlock.cs" />
     <Compile Include="LinkFlags.cs" />

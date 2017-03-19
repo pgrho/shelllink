@@ -120,8 +120,12 @@ namespace Shipwreck.ShellLink.OlePS
                         break;
                     }
 
+                case ValueType.ClsID:
+                    r.Value = reader.ReadGuid();
+                    break;
+
                 default:
-                    throw new NotImplementedException("[MS-OLEPS] 2.15");
+                    throw new NotImplementedException($"Unimplemented Type 0x{r.Type:X}. See [MS-OLEPS] 2.15");
             }
 
             return r;
@@ -251,6 +255,9 @@ namespace Shipwreck.ShellLink.OlePS
                     {
                         writer.Write(0);
                     }
+                    break;
+                case ValueType.ClsID:
+                    writer.Write((Guid)Value);
                     break;
 
                 default:

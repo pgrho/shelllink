@@ -1,71 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shipwreck.ShellLink.OlePS;
+using Shipwreck.ShellLink.PropStore;
 
 namespace Shipwreck.ShellLink
 {
     public sealed class PropertyStoreDataBlock : DataBlock
     {
-        internal const int VERSION = 0x53505331;
         internal const uint SIGNATURE = 0xA0000009;
 
-        private static readonly Guid StringName = Guid.Parse("D5CDD505-2E9C-101B-9397-08002B2CF9AE");
-
-        public Guid FormatID { get; set; }
+        private Collection<PropertyStore> _Stores;
 
         protected override uint GetSignature()
             => SIGNATURE;
 
-        public IDictionary<string, TypedPropertyValue> StringNamedValues { get; set; }
-        public IDictionary<int, TypedPropertyValue> IntegerNamedValues { get; set; }
+        public Collection<PropertyStore> Stores
+            => _Stores ?? (_Stores = new Collection<PropertyStore>());
 
         internal static PropertyStoreDataBlock Parse(BinaryReader reader, ref byte[] bytes, ref StringBuilder sb)
         {
-            // [MS-PROPSTORE] 2.2
+            // [MS-SHLLINK] 2.5.7
 
             var r = new PropertyStoreDataBlock();
-            var size = reader.ReadUInt32();
 
-            if (reader.ReadInt32() != VERSION)
+            var pss = PropertyStore.Parse(reader, ref bytes, ref sb);
+
+            if (pss != null)
             {
-                throw new FormatException();
-            }
-
-            r.FormatID = reader.ReadGuid();
-
-            if (r.FormatID == StringName)
-            {
-                // [MS-PROPSTORE] 2.3.1
-
-                var d = new Dictionary<string, TypedPropertyValue>();
-                for (var vs = reader.ReadInt32(); vs != 0; vs = reader.ReadInt32())
+                foreach (var ps in pss)
                 {
-                    var ns = reader.ReadUInt32();
-                    reader.ReadByte(); // 0
-                    int cc;
-                    var n = reader.ReadUnicodeString(ref sb, out cc);
-
-                    d[n] = TypedPropertyValue.Parse(reader, vs - 9 - 2 * cc, ref bytes, ref sb);
+                    r.Stores.Add(ps);
                 }
-                r.StringNamedValues = d;
-            }
-            else
-            {
-                // [MS-PROPSTORE] 2.3.2
-
-                var d = new Dictionary<int, TypedPropertyValue>();
-                for (var vs = reader.ReadInt32(); vs != 0; vs = reader.ReadInt32())
-                {
-                    var n = reader.ReadInt32();
-                    reader.ReadByte(); // 0
-
-                    d[n] = TypedPropertyValue.Parse(reader, vs - 13, ref bytes, ref sb);
-                }
-                r.IntegerNamedValues = d;
             }
 
             return r;
@@ -73,72 +42,15 @@ namespace Shipwreck.ShellLink
 
         protected override void WriteToCore(BinaryWriter writer)
         {
-            var bs = writer.BaseStream;
-            var bp = bs.Position;
-
-            writer.Write(0);
-            writer.Write(VERSION);
-            writer.Write(FormatID);
-
-            if (StringNamedValues?.Count > 0)
+            if (_Stores != null)
             {
-                writer.Write(StringName);
-
-                foreach (var kv in StringNamedValues)
+                foreach (var s in Stores)
                 {
-                    var bp2 = bs.Position;
-                    writer.Write(0);
-                    writer.Write(2 + kv.Key.Length * 2);
-                    writer.Write((byte)0);
-                    writer.Write(kv.Key);
-                    writer.Write('\0');
-
-                    kv.Value.WriteTo(writer);
-
-                    var lp2 = bs.Position;
-
-                    bs.Position = bp2;
-                    writer.Write((uint)(lp2 - bp2));
-
-                    bs.Position = lp2;
-                }
-            }
-            else
-            {
-                writer.Write(0L);
-                writer.Write(0L);
-
-                if (IntegerNamedValues != null)
-                {
-                    foreach (var kv in IntegerNamedValues)
-                    {
-                        var bp2 = bs.Position;
-                        writer.Write(0);
-                        writer.Write(kv.Key);
-                        writer.Write((byte)0);
-
-                        kv.Value.WriteTo(writer);
-
-                        var lp2 = bs.Position;
-
-                        bs.Position = bp2;
-                        writer.Write((uint)(lp2 - bp2));
-
-                        bs.Position = lp2;
-                    }
+                    s.WriteTo(writer);
                 }
             }
 
             writer.Write(0);
-
-            var lp = bs.Position;
-
-            bs.Position = bp;
-            writer.Write((uint)(lp - bp));
-
-            bs.Position = lp;
-
-            throw new NotImplementedException();
         }
     }
 }
