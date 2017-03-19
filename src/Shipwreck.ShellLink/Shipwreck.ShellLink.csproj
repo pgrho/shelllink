@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4C3F638D-7855-4821-9960-841C345CE819}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shipwreck.ShellLink</RootNamespace>
+    <AssemblyName>Shipwreck.ShellLink</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BinaryReaderExtensions.cs" />
+    <Compile Include="BinaryWriterExtensions.cs" />
+    <Compile Include="CommonNetworkRelativeLink.cs" />
+    <Compile Include="ConsoleDataBlock.cs" />
+    <Compile Include="ConsoleFEDataBlock.cs" />
+    <Compile Include="IconEnvironmentDataBlock.cs" />
+    <Compile Include="EnvironmentVariableDataBlock.cs" />
+    <Compile Include="DarwinDataBlock.cs" />
+    <Compile Include="DataBlock.cs" />
+    <Compile Include="DriveType.cs" />
+    <Compile Include="FileAttributesFlags.cs" />
+    <Compile Include="FillAttributes.cs" />
+    <Compile Include="FontFamily.cs" />
+    <Compile Include="Generated Codes\BinaryWriterExtensions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BinaryWriterExtensions.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Key.cs" />
+    <Compile Include="SpecialFolderDataBlock.cs" />
+    <Compile Include="KnownFolderDataBlock.cs" />
+    <Compile Include="LinkFlags.cs" />
+    <Compile Include="LinkInfo.cs" />
+    <Compile Include="CommonNetworkRelativeLinkFlags.cs" />
+    <Compile Include="LinkInfoFlags.cs" />
+    <Compile Include="Modifiers.cs" />
+    <Compile Include="NetworkProviderType.cs" />
+    <Compile Include="OlePS\TypedPropertyValue.cs" />
+    <Compile Include="OlePS\ValueType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyStoreDataBlock.cs" />
+    <Compile Include="ShellShortcut.cs" />
+    <Compile Include="ShimDataBlock.cs" />
+    <Compile Include="ShowCommand.cs" />
+    <Compile Include="TrackerDataBlock.cs" />
+    <Compile Include="UnknownDataBlock.cs" />
+    <Compile Include="VistaAndAboveIDListDataBlock.cs" />
+    <Compile Include="VolumeID.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Generated Codes\BinaryWriterExtensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>BinaryWriterExtensions.cs</LastGenOutput>
+      <LastOutputs>.\BinaryWriterExtensions.cs</LastOutputs>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

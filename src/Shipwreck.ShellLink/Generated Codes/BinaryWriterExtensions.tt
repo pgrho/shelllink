@@ -1,0 +1,53 @@
+<#@ template language="C#" debug="True" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ output extension="cs" #>
+<#
+// <copyright file="BinaryWriterExtensions.tt" company="">
+//  Copyright © . All Rights Reserved.
+// </copyright>
+
+var keywords = new []
+{
+	"byte", "int", "uint", "char"
+};
+
+#>
+using System.Collections.Generic;
+using System.IO;
+
+namespace Shipwreck.ShellLink
+{
+    partial class BinaryWriterExtensions
+    {
+<#
+
+foreach (var K in keywords)
+{
+#>
+        public static void Write(this BinaryWriter writer, IEnumerable<<#= K #>> value, int length)
+		{
+			var c = 0;
+			if (value != null)
+			{
+				foreach (var v in value)
+				{
+					if (++c > length)
+					{
+						break;
+					}
+					writer.Write(v);
+				}
+			}
+			for (; c < length; c++)
+			{
+				writer.Write(default(<#= K #>));
+			}
+		}
+
+<#
+}
+
+#>
+    }
+}
